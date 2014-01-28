@@ -1,0 +1,95 @@
+#! /bin/bash
+#
+# $SERVICE           Start/Stop a NodeBrain Agent Service.
+#
+# chkconfig: 2345 79 11
+# description: $SERVICE is a NodeBrain Agent Service
+# processname: nb
+# config: $CABOODLE  [ See /etc/sysconfig/$SERVICE ]
+# pidfile: /var/run/$SERVICE.pid
+
+# Source function library.
+. /etc/init.d/functions
+SERVICE=${0##*/}
+. /etc/sysconfig/$SERVICE
+ 
+# See how we were called.
+  
+prog=$SERVICE
+
+start() {
+	echo -n $"Starting $prog: "	
+        if [ -e /var/lock/subsys/$SERVICE ]; then
+	    if [ -e /var/run/$SERVICE.pid ] && [ -e /proc/`cat /var/run/$SERVICE.pid` ]; then
+		echo -n $"cannot start $SERVICE: $SERVICE is already running.";
+		failure $"cannot start $SERVICE: $SERVICE already running.";
+		echo
+		return 1
+	        fi
+	    fi
+        stamp=`date '+%Y%m%d%H%M%S'`;
+        if [ -f "$CABOODLE/log/$AGENT.log" ]; then mv $CABOODLE/log/$AGENT.log $CABOODLE/log/$AGENT.$stamp.log; fi
+        if [ -f "$CABOODLE/log/$AGENT.out" ]; then mv $CABOODLE/log/$AGENT.out $CABOODLE/log/$AGENT.$stamp.out; fi
+        daemon $DAEMON_ARGS "cd $CABOODLE;bin/nb -d --pidfile=$CABOODLE/var/run/$SERVICE.pid $CABOODLE/agent/$AGENT > $CABOODLE/log/$AGENT.out 2>&1"
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE;
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+        if [ ! -e /var/lock/subsys/$SERVICE ]; then
+	    echo -n $"cannot stop $SERVICE: $SERVICE is not running."
+	    failure $"cannot stop $SERVICE: $SERVICE is not running."
+	    echo
+	    return 1;
+	fi
+        killproc -p $CABOODLE/var/run/$SERVICE.pid $SERVICE
+	RETVAL=$?
+	echo
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$SERVICE;
+	return $RETVAL
+}	
+
+rhstatus() {
+	status $SERVICE
+}	
+
+restart() {
+  	stop
+	start
+}	
+
+reload() {
+        echo  "Reload $SERVICE configuration not supported - use restart"
+	#echo -n $"Reloading $SERVICE daemon configuration: "
+	#killproc $SERVICE -HUP
+	#RETVAL=$?
+	#echo
+	#return $RETVAL
+}	
+
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+  	restart
+	;;
+  reload)
+  	reload
+	;;
+  status)
+  	rhstatus
+	;;
+  condrestart)
+  	[ -f /var/lock/subsys/$SERVICE ] && restart || :
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+	exit 1
+esac

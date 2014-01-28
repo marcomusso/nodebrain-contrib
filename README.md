@@ -37,3 +37,10 @@ Please note: the nodebrain.service file has a different line from the original:
 basically I added $DAEMON_ARGS to pass (for example) the --user argument and redefined the position of the pid file.
 
 nodebrain.sysconfig (from the original distribution) is not needed since it's created by the script.
+
+## TODO
+
+It would be nice to be able to use the connect command even if the agent is started without nbkit.
+Right now I could use:
+
+	bin/nb ':define agentname node peer("agentname@socket/agentname");' -">agentname:"

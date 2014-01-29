@@ -7,7 +7,7 @@ Some files useful to a nodebrain/caboodle installation
 
 NOTE: only RedHat/CentOS is supported. Tested on RHEL 6.4
 
-The setup directory is intended as a addendum to the same directory in a caboodle.
+The setup directory is intended as an addendum to the same directory in a caboodle.
 
 Run (as root) enable_statup_on_boot.sh to:
 
@@ -25,18 +25,18 @@ if your agent (or its servants) require some variables (for example ORACLE_HOME)
 
 Please note: the nodebrain.service file has a different line from the original:
 
-	(start)
+	(start: added $DAEMON_ARGS, changed the parameter order for nb)
 
-        daemon $DAEMON_ARGS "cd $CABOODLE;bin/nb -d --pidfile=$CABOODLE/var/run/$SERVICE.pid $CABOODLE/agent/$AGENT > $CABOODLE/log/$AGENT.out 2>&1"
+        daemon $DAEMON_ARGS "cd $CABOODLE;bin/nb -d $CABOODLE/agent/$AGENT --pidfile=$CABOODLE/var/run/$SERVICE.pid > $CABOODLE/log/$AGENT.out 2>&1"
 
-	(stop)
+	(stop: tells killproc where is the pidfile)
 
         killproc -p $CABOODLE/var/run/$SERVICE.pid $SERVICE
 
 
-basically I added $DAEMON_ARGS to pass (for example) the --user argument and redefined the position of the pid file.
+$DAEMON_ARGS could be used (for example) to pass the --user argument to start an agent as a regular user.
 
-nodebrain.sysconfig (from the original distribution) is not needed since it's created by the script.
+nodebrain.sysconfig (from the original distribution) is not needed since it's created dynamically by the script.
 
 ## TODO
 
@@ -44,3 +44,11 @@ It would be nice to be able to use the connect command even if the agent is star
 Right now I could use:
 
 	bin/nb ':define agentname node peer("agentname@socket/agentname");' -">agentname:"
+
+Perhaps defined as a function:
+
+	function connect2agent {
+	  [ $# -eq 0 ] && (echo "Please specify agent name."; exit 1)
+	  bin/nb ":define $1 node peer(\"$1@socket/$1\");" -">$1:"
+	}
+

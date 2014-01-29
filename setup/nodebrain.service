@@ -30,7 +30,7 @@ start() {
         stamp=`date '+%Y%m%d%H%M%S'`;
         if [ -f "$CABOODLE/log/$AGENT.log" ]; then mv $CABOODLE/log/$AGENT.log $CABOODLE/log/$AGENT.$stamp.log; fi
         if [ -f "$CABOODLE/log/$AGENT.out" ]; then mv $CABOODLE/log/$AGENT.out $CABOODLE/log/$AGENT.$stamp.out; fi
-        daemon $DAEMON_ARGS "cd $CABOODLE;bin/nb -d --pidfile=$CABOODLE/var/run/$SERVICE.pid $CABOODLE/agent/$AGENT > $CABOODLE/log/$AGENT.out 2>&1"
+        daemon $DAEMON_ARGS "cd $CABOODLE;bin/nb -d $CABOODLE/agent/$AGENT --pidfile=$CABOODLE/var/run/$SERVICE.pid > $CABOODLE/log/$AGENT.out 2>&1"
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE;

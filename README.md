@@ -15,9 +15,13 @@ Run (as root) enable_statup_on_boot.sh to:
 2. add the agents with chkconfig (you can later choose the runlevels, defaults: 2345)
 3. create the /etc/sysconfig/<agent name> with some variables
 
-If you want to run the agent as normal user you can define:
+## Usage
 
-	DAEMON_ARGS="export DAEMON_ARGS=\"--user=<your agents user>\""
+	enable_statup_on_boot.sh -c <caboodle full path> -a \"<agent1> <agent2> <...>\" [-u <user>]"
+
+If there are multiple agents quote them...
+
+## Additional customizations
 
 if your agent (or its servants) require some variables (for example ORACLE_HOME) you can set them in EXTRA_VAR (please note the \n to separate the lines):
 
@@ -34,7 +38,7 @@ Please note: the nodebrain.service file has a different line from the original:
         killproc -p $CABOODLE/var/run/$SERVICE.pid $SERVICE
 
 
-$DAEMON_ARGS could be used (for example) to pass the --user argument to start an agent as a regular user.
+$DAEMON_ARGS is used (for example) to pass the --user argument to start an agent as a regular user (passed as -u in the script).
 
 nodebrain.sysconfig (from the original distribution) is not needed since it's created dynamically by the script.
 

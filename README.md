@@ -17,7 +17,7 @@ Run (as root) enable_statup_on_boot.sh to:
 
 ## Usage
 
-	enable_statup_on_boot.sh -c <caboodle full path> -a \"<agent1> <agent2> <...>\" [-u <user>]"
+	enable_statup_on_boot.sh -c <caboodle full path> -a "<agent1> <agent2> <...>" [-u <user>]"
 
 If there are multiple agents quote them...
 

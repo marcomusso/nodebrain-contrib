@@ -48,7 +48,10 @@ Right now I could use:
 Perhaps defined as a function:
 
 	function connect2agent {
-	  [ $# -eq 0 ] && (echo "Please specify agent name."; exit 1)
-	  bin/nb ":define $1 node peer(\"$1@socket/$1\");" -">$1:"
+	  if [ $# -eq 0 ]; then
+	    echo "Please specify agent name."
+	  else
+	    bin/nb ":define $1 node peer(\"$1@socket/$1\");" -">$1:"
+	  fi
 	}
 
